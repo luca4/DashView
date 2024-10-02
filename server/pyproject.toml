@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "server"
+version = "0.1.0"
+description = ""
+authors = ["Luca <l@l.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.115.0"
+uvicorn = "^0.30.6"
+python-socketio = "^5.11.4"
+schedule = "^1.2.2"
+requests = "^2.32.3"
+smbus2 = "^0.4.3"
+bme280 = "^0.7"
+paho-mqtt = "^2.1.0"
+loguru = "^0.7.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
