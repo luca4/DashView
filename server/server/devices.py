@@ -1,6 +1,6 @@
 import threading
 import asyncio
-from threading import Timer
+import os
 from time import sleep
 from .custom_timer import CustomTimer
 
@@ -10,26 +10,25 @@ import platform
 from loguru import logger
 
 
-if platform.system() != "Windows":
+
+if os.getenv("DEPLOY_TYPE") == "PROD":
     import RPi.GPIO as GPIO 
     GPIO.setmode(GPIO.BOARD)
     GPIO.setwarnings(False)
 
 
-
 class TempSensor:
-    if platform.system() != "Windows":
-        import smbus2
-        import bme280
+    import smbus2
+    import bme280
     
     
     def __init__(self) -> None:
-        if platform.system() != "Windows":
+        if os.getenv("DEPLOY_TYPE") == "PROD":
             self.address = 0x76
             self.bus = self.smbus2.SMBus(bus_number = 1)
 
     def _get_ambient_data(self):
-        if platform.system() == "Windows":
+        if not os.getenv("DEPLOY_TYPE") == "PROD":
             return {'temperature': 11.11, 'humidity': 11.11}
         
         calibration_params = self.bme280.load_calibration_params(self.bus, self.address)
@@ -55,7 +54,7 @@ class TempSensor:
 
 class Heater:
     pin = 31
-    if platform.system() != "Windows":
+    if os.getenv("DEPLOY_TYPE") == "PROD":
         GPIO.setmode(GPIO.BOARD)
         GPIO.setup(pin, GPIO.OUT)
 
@@ -66,7 +65,7 @@ class Heater:
 
     def turn_on(self, minutes: int):
         self.is_on = True
-        if not platform.system() == "Windows":
+        if os.getenv("DEPLOY_TYPE") == "PROD":
             GPIO.output(Heater.pin, GPIO.HIGH)
 
         logger.debug(f"Heater - turn on for {minutes} minutes")
@@ -78,7 +77,7 @@ class Heater:
 
     def turn_off(self):
         self.is_on = False
-        if not platform.system() == "Windows":
+        if os.getenv("DEPLOY_TYPE") == "PROD":
             GPIO.output(Heater.pin, GPIO.LOW)
         
         logger.debug("Heater - turn off")
