@@ -3,7 +3,7 @@ from loguru import logger
 from server.devices import heater
 from server.trash_manager import trash_manager
 
-from server import  sio
+from . import app, sio, fastapi_app
 
 
 @sio.on("heaterOn")
@@ -30,7 +30,32 @@ def heater_off(sid):
 
 @sio.on("getTrash")
 def send_trash(sid):
-    logger.debug(f"Received event 'sendTrash'")
+    logger.debug(f"Received event 'getTrash'")
+    try:
+        trashData = trash_manager.get_trash_data()
+        trashData["result"] = "OK"
+        return trashData
+    except Exception as ex:
+        print(ex)
+        return {"result": "FAIL"}
+    
+
+@sio.on("updateTrashDb")
+def update_trash_db(sid):
+    try:
+        logger.debug(f"Received event 'updateTrashDb'")
+        trash_manager.update_yearly_data()
+
+        trashData = trash_manager.get_trash_data()
+        trashData["result"] = "OK"
+        return trashData
+    except:
+        return {"result": "FAIL"}
+
+    
+@sio.on("getLastTrashDbUpdateDate")
+def get_trash_db_last_update_date(sid):
+    logger.debug(f"Received event 'getLastTrashDbUpdateDate'")
     try:
         trashData = trash_manager.get_trash_data()
         trashData["result"] = "OK"
@@ -38,27 +63,10 @@ def send_trash(sid):
     except:
         return {"result": "FAIL"}
 
-#@fastapi_app.get('/heater/on/{minutes}')
-#async def heater_on_endpoint(minutes: int):
-#    heater.turn_on(int(minutes))
-#    return "OK"
-#
-#
-#@fastapi_app.get('/heater/off')
-#async def heater_off_endpoint():
-#    heater.turn_off()
-#    return "OK"
-#
-#
-#@fastapi_app.get('/smartplug/on/{minutes}')
-#def smartplug_on_endpoint(minutes: int):
-#    smartplug.turn_on(minutes)
-#    return "OK"
-#
-#@fastapi_app.get('/smartplug/off')
-#def smartplug_off_endpoint():
-#    smartplug.turn_off()
-#    return "OK"
+
+@fastapi_app.get('/status')
+def status():
+    return "Running..."
 
 
 

@@ -1,53 +1,74 @@
 import asyncio
+from inspect import cleandoc
 import time
-from datetime import date
+from datetime import date, datetime, timedelta
 import json
 from loguru import logger
 import requests
 import schedule
 import threading
+import pymongo
 
+DB_NAME = "trash_db"
 
 class TrashManager:
 
     def __init__(self):
-        self.data = {}  # date -> string_array
-        #self.update_data()
+        db_client = pymongo.MongoClient("mongoDb", 27017)
 
-    # parse data from trash site and update dictionary
-    def update_data(self):
-        logger.debug("TrashManager - Gathering data from site")
+        # Get db collection
+        trash_db = db_client[DB_NAME]
+        self.trash_coll = trash_db["trash"]
+
+    
+    def _get_yearly_data_from_site(self):
+        logger.debug("TrashManager - Gathering annual data from site")
         today_date = date.today()
         today_year = today_date.year
-        today_month = today_date.month
 
-        address = f'http://www.convenzionerifiutisesto.it/RaccolteDomicilio/LoadCalendarioMensile?comuneId=18&year={today_year}&month={today_month}'
-        json_data = json.loads(requests.get(address).content)
+        # Gather all months data from site
+        days = []
+        for month in range(1, 13):
+            address = f'http://www.convenzionerifiutisesto.it/RaccolteDomicilio/LoadCalendarioMensile?comuneId=18&year={today_year}&month={month}'
+            json_data = json.loads(requests.get(address).content)
+            days = days + json_data['Giorni']
 
-        days = json_data['Giorni']
-
-        days_counter = 1
-        monthly_trash = {}
+        # Parse gathered data and pack it into a dictionary
+        trash_data = []
         for day in days:
+            day_date = datetime.fromtimestamp(int(day["Data"].replace("/Date(","").replace(")/",""))/1000)
+            is_festivo = day["Festivo"]
+            festivita = day["Festivita"]
+
+            day_trash = []
             for x in day['Eventi']:
-                if days_counter not in monthly_trash:
-                    monthly_trash[days_counter] = [x["Testo"]]
-                else:
-                    monthly_trash[days_counter].append(x["Testo"])
-            days_counter += 1
+                day_trash.append(x["Testo"])
 
-        self.data = monthly_trash
+            trash_data.append({
+                "date": day_date,
+                "festivo": is_festivo,
+                "festivita": festivita,
+                "trash": day_trash
+            })
 
-    # return today's and tomorrow's trash from data gathered from site
+        return trash_data
+
+
+    # return today's and tomorrow's trash from db data
     def get_trash_data(self):
-        actual_date = date.today()
-        today_number = actual_date.day
 
-        today_trash = self.data.get(today_number, "--")
-        tomorrow_trash = self.data.get(today_number+1, "--")
+        tmp_date = date.today()
+        today_date = datetime(tmp_date.year, tmp_date.month, tmp_date.day)
+        tomorrow_date = today_date + timedelta(days=1)
 
-        return {'today': today_trash, 'tomorrow': tomorrow_trash}
+        today_trash = self.trash_coll.find_one({"date": today_date})
+        tomorrow_trash = self.trash_coll.find_one({"date": tomorrow_date})
+
+        lastDbUpdate = self.trash_coll.find_one({"name": "TrashDbInfo"})
+
+        return {'today': today_trash["trash"], 'tomorrow': tomorrow_trash["trash"], 'lastDbUpdate': lastDbUpdate["lastDataUpdate"].isoformat()}
     
+
     def _emit_trash_data(self):
         from . import sio
 
@@ -59,13 +80,12 @@ class TrashManager:
         asyncio.run(emit("trashData", data))
 
 
-    def send_trash(self):
-        trash_manager.update_data()
+    def _send_trash(self):
         self._emit_trash_data()
 
 
     def schedule_trash_sending(self):
-        schedule.every().day.at("00:01").do(self.send_trash)
+        schedule.every().day.at("00:01").do(self._send_trash)
 
         def run_continuously():
             while True:
@@ -74,6 +94,19 @@ class TrashManager:
 
         threading.Thread(target=run_continuously, daemon=True).start()
 
+
+    def update_yearly_data(self):
+        # Get trash data
+        trash_data = self._get_yearly_data_from_site()
+
+        # Reset db data
+        self.trash_coll.delete_many({})
+
+        # Insert trash data
+        self.trash_coll.insert_many(trash_data)
+
+        self.trash_coll.insert_one({"name": "TrashDbInfo", "lastDataUpdate": datetime.now()})
+        
 
 trash_manager = TrashManager()
 
