@@ -23,17 +23,24 @@
 
   import { ref } from 'vue';
   import DigitalClock from './DigitalClock.vue';
+  import {useI18n} from 'vue-i18n' 
+
+
+  const {t} = useI18n();
+
+
+  console.log(t("common.arr[0]"))
 
   let date = ref("")
 
-  let week: Array<string> = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
-  let months: Array<string> = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
   setInterval(updateDate, 1000);
   updateDate();
 
   function updateDate(): void {
-      var now = new Date();
-      date.value = week[now.getDay()] + ', ' + zeroPadding(now.getDate(), 2) + ' ' + months[now.getMonth()] + ' ' + zeroPadding(now.getFullYear(), 4);
+      const now = new Date();
+      const dayVal = now.getDay()-1;
+      const monthVal = now.getMonth();
+      date.value = t("common.weekDays["+dayVal+"]") + ', ' + zeroPadding(now.getDate(), 2) + ' ' + t("common.months["+monthVal+"]") + ' ' + zeroPadding(now.getFullYear(), 4);
   };
 
   function zeroPadding(num: number, digit: number): string {

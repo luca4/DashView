@@ -1,0 +1,60 @@
+{
+    "common": {
+        "findMyPhoneLabel": "FIND MY PHONE",
+        "weekDays": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"
+        ],
+        "months": [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December"
+        ],
+        "arr": [
+            "11",
+            "22"
+        ]
+    },
+    "heater": {
+        "heaterLabel": "Heater",
+        "turnOn60": "TURN ON 60 MIN",
+        "turnOnCustom": "TURN ON CUSTOM",
+        "turnOff": "TURN OFF",
+        "statusLabel": "Status",
+        "remaining": "Remaining",
+        "turnOnFor": "Turn on for",
+        "status": {
+            "on": "Turned On",
+            "off": "Turned Off"
+        }
+    },
+    "ambient": {
+        "ambientLabel": "Ambient",
+        "temperature": "Temperature",
+        "humidity": "Humidity"
+    },
+    "trash": {
+        "trashLabel": "Trash",
+        "today": "Today",
+        "tomorrow": "Tomorrow",
+        "trashDatabase": "Trash Database",
+        "lastUpdate": "Last Update",
+        "updateNow": "Update Now",
+        "dbUpdateFailure": "Update failed",
+        "dbUpdateSuccess": "Update succeeded"
+    }
+}

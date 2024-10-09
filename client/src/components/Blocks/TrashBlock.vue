@@ -2,17 +2,17 @@
     <v-sheet class="pa-0 ma-3 rounded-lg" :height="cellHeight">
       <v-row no-gutters>
         <v-col class="text-center">
-          <p class="mt-n5 mb-3 text-white" style="font-size: 14px; height: 18px; ">Rifiuti</p>
+          <p class="mt-n5 mb-3 text-white" style="font-size: 14px; height: 18px; ">{{ t("trash.trashLabel") }}</p>
         </v-col>
       </v-row>
       <v-row no-gutters>
         <v-col class="text-center mt-4" >
-          <p style="font-size: 20px;">Oggi: {{ todayTrash }}</p>     
+          <p style="font-size: 20px;">{{ t("trash.today") }}: {{ todayTrash }}</p>     
         </v-col>
       </v-row>
       <v-row>
         <v-col class="text-center my-0" >
-          <p style="font-size: 20px;">Domani: {{ tomorrowTrash }}</p>
+          <p style="font-size: 20px;">{{ t("trash.tomorrow") }}: {{ tomorrowTrash }}</p>
         </v-col>
       </v-row>
       <v-row no-gutters>
@@ -25,17 +25,17 @@
           <v-container>
             <v-row>
               <v-col class="text-center">
-                <p style="font-size: 18px;"><strong>Database rifiuti</strong></p>
+                <p style="font-size: 18px;"><strong>{{ t("trash.trashDatabase") }}</strong></p>
               </v-col>
             </v-row>
             <v-row>
               <v-col class="text-center">
-                <p>Ultimo aggiornamento: {{ lastTrashDbUpdate }}</p>
+                <p>{{ t("trash.lastUpdate") }}: {{ lastTrashDbUpdate }}</p>
               </v-col>
             </v-row>
             <v-row>
               <v-col class="text-center my-0">
-                <v-btn @click="updateTrashDb">Aggiorna ora</v-btn>
+                <v-btn @click="updateTrashDb">{{ t("trash.updateNow") }}</v-btn>
               </v-col>
               <v-col v-if="isTrashDbUpdating">
                 <v-progress-circular color="primary" indeterminate>
@@ -46,10 +46,10 @@
         </v-sheet>
       </v-overlay>
       <v-snackbar v-model="snackbarOk" :timeout="2000" color="success" rounded="pill" class="text-center">
-        <p style="font-size: 18px;">Update avvenuto con successo</p>
+        <p style="font-size: 18px;">{{ t("trash.dbUpdateSuccess") }}</p>
       </v-snackbar>
       <v-snackbar v-model="snackbarFail" :timeout="2000" color="error" rounded="pill" class="text-center">
-        <p style="font-size: 18px;">Update non riuscito</p>
+        <p style="font-size: 18px;">{{ t("trash.dbUpdateFailure") }}</p>
       </v-snackbar>
     </v-sheet>
 </template>
@@ -58,6 +58,11 @@
 
 import { socket } from "@/socket";
 import { onMounted, ref } from 'vue';
+
+import {useI18n} from 'vue-i18n' 
+
+
+const {t} = useI18n();
 
 const props = defineProps({
     cellHeight: { type: Number, required: true }

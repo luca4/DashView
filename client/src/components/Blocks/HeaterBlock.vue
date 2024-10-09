@@ -2,24 +2,24 @@
     <v-sheet class="pa-0 ma-3 rounded-lg" :height="cellHeight">
       <v-row no-gutters>
         <v-col class="text-center">
-          <p class="mt-n5 mb-3 text-white" style="font-size: 14px; height: 18px; ">Caldaia</p>
+          <p class="mt-n5 mb-3 text-white" style="font-size: 14px; height: 18px; ">{{ t("heater.heaterLabel") }}</p>
         </v-col>
       </v-row>
       <v-row no-gutters>
         <v-col class="text-center" >
-          <v-btn stacked height="60px" width="20px" @click="turnOnHeater(60)">
+          <v-btn stacked height="60px" width="20px" @click="turnOnHeater(60)" class="px-0">
             <template #prepend>
               <v-icon :icon="mdiPower" :size="30"></v-icon>
             </template>
-            <p style="font-size: 10px; height: 25px;">Accendi <br> 60 Min</p>
+            <p style="font-size: 10px; height: 25px;">{{ t("heater.turnOn60") }}</p>
           </v-btn>
         </v-col> 
         <v-col class="text-center">
-          <v-btn id="overlayActivator" stacked height="60px" width="20px" @click="overlay = true">
+          <v-btn id="overlayActivator" stacked height="60px" width="20px" @click="overlay = true" class="px-0">
             <template #prepend>
               <v-icon :icon="mdiPower" :size="30"></v-icon>
             </template>
-            <p style="font-size: 10px; height: 25px; ">Accendi<br>Custom</p>
+            <p style="font-size: 10px; height: 25px; ">{{ t("heater.turnOnCustom") }}</p>
           </v-btn>
           <v-overlay v-model="overlay" class="align-center justify-center">
             <v-time-picker format="24hr" elevation="24" v-model:hour="hoursModel" v-model:minute="minutesModel" title="Tempo di accesione:">
@@ -32,26 +32,26 @@
           </v-overlay>
         </v-col>
         <v-col class="text-center">
-          <v-btn stacked height="60px" width="20px" @click="turnOffHeater()">
+          <v-btn stacked height="60px" width="20px" @click="turnOffHeater()" class="px-0">
             <template #prepend>
               <v-icon :icon="mdiPower" :size="30"></v-icon>
             </template>
-            <p style="font-size: 10px; height: 25px; line-height: 25px;">Spegni</p>
+            <p style="font-size: 10px; height: 25px; line-height: 25px;">{{ t("heater.turnOff") }}</p>
           </v-btn>
         </v-col>
       </v-row>
       <v-row>
         <v-col class="text-center my-1 py-0" >
-          <span>Stato:
-            <strong v-if="mainStore.isHeaterOn">Accesa</strong>
-            <strong v-else>Spenta</strong>
+          <span>{{ t("heater.statusLabel") }}:
+            <strong v-if="mainStore.isHeaterOn">{{ t("heater.status.on") }}</strong>
+            <strong v-else>{{ t("heater.status.off") }}</strong>
           </span>
         </v-col>
       </v-row>
       <v-row>
         <v-col class="text-center my-1 py-0" >
           <span v-if="mainStore.isHeaterOn">
-            Rimanente: {{ remainingMinutes }}
+            {{ t("heater.remaining") }}: {{ remainingMinutes }}
           </span>
         </v-col>
       </v-row>
@@ -65,6 +65,11 @@ import { onMounted, ref, watch } from 'vue';
 import { VTimePicker } from 'vuetify/labs/VTimePicker'
 
 import { socket } from "@/socket";
+
+import {useI18n} from 'vue-i18n' 
+
+
+const {t} = useI18n();
 
 const props = defineProps({
     cellHeight: { type: Number, required: true }

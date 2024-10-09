@@ -1,0 +1,56 @@
+{
+    "common": {
+        "findMyPhoneLabel": "FIND MY PHONE",
+        "weekDays": [
+            "Lunedì",
+            "Martedì",
+            "Mercoledì",
+            "Giovedì",
+            "Venerdì",
+            "Sabato",
+            "Domenica"
+        ],
+        "months": [
+            "Gennaio",
+            "Febbraio",
+            "Marzo",
+            "Aprile",
+            "Maggio",
+            "Giugno",
+            "Luglio",
+            "Agosto",
+            "Settembre",
+            "Ottobre",
+            "Novembre",
+            "Dicembre"
+        ]
+    },
+    "heater": {
+        "heaterLabel": "Caldaia",
+        "turnOn60": "Accendi 60 min",
+        "turnOnCustom": "Accendi Custom",
+        "turnOff": "Spegni",
+        "statusLabel": "Stato",
+        "remaining": "Rimanente",
+        "turnOnFor": "Tempo di accensione",
+        "status": {
+            "on": "Accesa",
+            "off": "Spenta"
+        }
+    },
+    "ambient": {
+        "ambientLabel": "Ambiente",
+        "temperature": "Temperatura",
+        "humidity": "Umidità"
+    },
+    "trash": {
+        "trashLabel": "Rifiuti",
+        "today": "Oggi",
+        "tomorrow": "Domani",
+        "trashDatabase": "Database Rifiuti",
+        "lastUpdate": "Ultimo aggiornamento",
+        "updateNow": "Aggiorna ora",
+        "dbUpdateFailure": "Errore durante l'update dei rifiuti",
+        "dbUpdateSuccess": "Database rifiuti aggiornato"
+    }
+}
