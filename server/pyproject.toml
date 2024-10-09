@@ -16,6 +16,7 @@ smbus2 = "^0.4.3"
 bme280 = "^0.7"
 paho-mqtt = "^2.1.0"
 loguru = "^0.7.2"
+pymongo = "^4.10.1"
 
 
 [build-system]
