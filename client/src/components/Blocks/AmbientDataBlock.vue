@@ -30,9 +30,7 @@ const temperature = ref(0)
 const humidity = ref(0)
 
 onMounted(() => {
-  console.log("mountAmbientData")
   socket.on("ambientData", (data: {temperature:number, humidity:number}) => {
-    console.log("receive ambient data ") 
     temperature.value = data.temperature
     humidity.value = data.humidity
   });

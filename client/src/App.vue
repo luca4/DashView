@@ -78,7 +78,7 @@
   onMounted(() => {
     const connectionStore = useConnectionStore();
 
-    socket.off();
+    //socket.off();
     connectionStore.bindEvents();
     connectionStore.connect();
 
