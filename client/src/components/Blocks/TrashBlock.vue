@@ -15,10 +15,47 @@
           <p style="font-size: 20px;">Domani: {{ tomorrowTrash }}</p>
         </v-col>
       </v-row>
+      <v-row no-gutters>
+        <v-col class="text-right">
+          <v-btn id="trashSetupBtn" density="compact" class="px-0 mx-0 mt-3 mr-1"  text="setup"></v-btn>
+        </v-col>
+      </v-row>
+      <v-overlay activator="#trashSetupBtn" class="align-center justify-center">
+        <v-sheet class="pa-4 rounded-lg">
+          <v-container>
+            <v-row>
+              <v-col class="text-center">
+                <p style="font-size: 18px;"><strong>Database rifiuti</strong></p>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col class="text-center">
+                <p>Ultimo aggiornamento: {{ lastTrashDbUpdate }}</p>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col class="text-center my-0">
+                <v-btn @click="updateTrashDb">Aggiorna ora</v-btn>
+              </v-col>
+              <v-col v-if="isTrashDbUpdating">
+                <v-progress-circular color="primary" indeterminate>
+                </v-progress-circular>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-sheet>
+      </v-overlay>
+      <v-snackbar v-model="snackbarOk" :timeout="2000" color="success" rounded="pill" class="text-center">
+        <p style="font-size: 18px;">Update avvenuto con successo</p>
+      </v-snackbar>
+      <v-snackbar v-model="snackbarFail" :timeout="2000" color="error" rounded="pill" class="text-center">
+        <p style="font-size: 18px;">Update non riuscito</p>
+      </v-snackbar>
     </v-sheet>
 </template>
 
 <script setup lang="ts">
+
 import { socket } from "@/socket";
 import { onMounted, ref } from 'vue';
 
@@ -28,36 +65,55 @@ const props = defineProps({
 
 const todayTrash = ref("--")
 const tomorrowTrash = ref("--")
+const lastTrashDbUpdate = ref("")
+
+const snackbarOk = ref(false)
+const snackbarFail = ref(false)
+
+const isTrashDbUpdating = ref(false)
 
 onMounted(async () => {
-
-  // Once created ask for trash data
-  interface serverResponse {today:any, tomorrow:any, result:string}
-  const resp: serverResponse = await socket.emitWithAck("getTrash")
-  if(resp.result === "OK") {
-    if(resp.today === "--")
-      resp.today = [resp.today]
-
-    if(resp.tomorrow === "--")
-      resp.tomorrow = [resp.tomorrow]
-
-    setTrashData({today:resp.today, tomorrow:resp.tomorrow})
-  }
 
   // Register for trash data events emitted from server
   socket.on("trashData", (data: {today:Array<string>, tomorrow:Array<string>}) => {
     setTrashData(data)
   });
+
+  // Once created ask for trash data
+  interface serverResponse {today:any, tomorrow:any, result:string, lastDbUpdate:any}
+  const resp: serverResponse = await socket.emitWithAck("getTrash")
+  setTrashData({today:resp.today, tomorrow:resp.tomorrow})
+
+  // Once created set last update time
+  lastTrashDbUpdate.value = new Date(resp.lastDbUpdate).toLocaleString()
 })
 
+// Set trash data shown
 function setTrashData(data: {today:Array<string>, tomorrow:Array<string>}) {
-  console.log(typeof data.today, data.today)
-  console.log(typeof data.tomorrow, data.tomorrow)
-  todayTrash.value = data.today.join(", ")
-  tomorrowTrash.value = data.tomorrow.join(", ")
+  todayTrash.value = data.today.length == 0 ? "--" : data.today.join(", ")
+  tomorrowTrash.value = data.tomorrow.length == 0 ? "--" : data.tomorrow.join(", ")
 }
 
+// Ask to server to update trash db and refresh update time and trash data shown
+async function updateTrashDb() {
+  isTrashDbUpdating.value = true
 
+  interface serverResponse {today:any, tomorrow:any, result:string, lastDbUpdate:any}
+  const resp: serverResponse = await socket.emitWithAck("updateTrashDb")
 
+  if(resp.result === "OK") {
+    setTrashData({today:resp.today, tomorrow:resp.tomorrow})
+
+    const lastDbUpdate = new Date(resp.lastDbUpdate)
+    lastTrashDbUpdate.value = lastDbUpdate.toLocaleString()
+
+    snackbarOk.value = true
+  }
+  else {
+    snackbarFail.value = true
+  }
+
+  isTrashDbUpdating.value = false
+}
 
 </script>
