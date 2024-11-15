@@ -4,7 +4,6 @@
 
 It is based on a web application designed for smart home automation, allowing users to control and monitor several home functions, such as the boiler, temperature/pressure sensors and waste management. The application provides an intuitive, multi-language interface with real-time communication between the backend and frontend.
 
-![Immagine 2024-10-10 123324](https://github.com/user-attachments/assets/0ce405d5-b4ab-4521-a13e-5126d8b1e8b6)
 
 ---
 
@@ -23,7 +22,7 @@ It is based on a web application designed for smart home automation, allowing us
 Dashview is divided into two main components:
 
 1. **Backend**:
-   - Written in Python, with **FastAPI**.
+   - Written in **Python**, with **FastAPI**.
    - Virtual environment management handled by **Poetry**.
    - Communicates with a **MongoDB** database (running in a separate container) to store waste collection data retrieved from the official trash management website.
    - Real-time event-based communication using **SocketIO**.
